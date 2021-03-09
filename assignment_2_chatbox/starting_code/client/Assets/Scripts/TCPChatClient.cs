@@ -27,7 +27,7 @@ public class TCPChatClient : MonoBehaviour
     {
         try
         {
-			_client = new TcpClient();
+            _client = new TcpClient();
             _client.Connect(_hostname, _port);
             _panelWrapper.ClearOutput();
             _panelWrapper.AddOutput("Connected to server.");
@@ -45,23 +45,31 @@ public class TCPChatClient : MonoBehaviour
 
         _panelWrapper.ClearInput();
 
-		try 
+        try
         {
-			//echo client - send one, expect one (hint: that is not how a chat works ...)
-			byte[] outBytes = Encoding.UTF8.GetBytes(pInput);
-			StreamUtil.Write(_client.GetStream(), outBytes);
+            //echo client - send one, expect one (hint: that is not how a chat works ...)
+            byte[] outBytes = Encoding.UTF8.GetBytes(pInput);
+            StreamUtil.Write(_client.GetStream(), outBytes);
 
-			byte[] inBytes = StreamUtil.Read(_client.GetStream());
-            string inString = Encoding.UTF8.GetString(inBytes);
-            _panelWrapper.AddOutput(inString);
-		} 
-        catch (Exception e) 
+        }
+        catch (Exception e)
         {
             _panelWrapper.AddOutput(e.Message);
-			//for quicker testing, we reconnect if something goes wrong.
-			_client.Close();
-			connectToServer();
-		}
+            //for quicker testing, we reconnect if something goes wrong.
+            _client.Close();
+            connectToServer();
+        }
+    }
+
+    private void Update()
+    {
+        if (_client.Available > 0)
+        {
+            byte[] inBytes = StreamUtil.Read(_client.GetStream());
+            string inString = Encoding.UTF8.GetString(inBytes);
+            _panelWrapper.AddOutput(inString);
+        }
+
     }
 
 }
