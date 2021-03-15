@@ -69,7 +69,7 @@ class TCPServerSample
                 if (messeges.Count > 0)
                 {
                     Dictionary<TcpClient, byte[]> newMesseges = new Dictionary<TcpClient, byte[]>();
-                    MakeMesseges(ref clientData, messeges, newMesseges,clients);
+                    MakeMesseges(ref clientData, messeges, newMesseges, clients);
 
                     foreach (KeyValuePair<TcpClient, byte[]> messege in newMesseges)
                     {
@@ -180,21 +180,49 @@ class TCPServerSample
                     HelpMesseges(messege);
                     break;
                 case "/whisper":
+                    Whisper(clientData, messege, subs);
                     break;
                 case "/w":
+                    Whisper(clientData, messege, subs);
                     break;
                 default:
-                    DateTime now = DateTime.Now;
-                    Console.WriteLine(now.ToString("F"));
                     byte[] outBytesClientName = Encoding.UTF8.GetBytes(clientData[messege.Key] + ": ");
-                    byte[] outBytesTime = Encoding.UTF8.GetBytes("-at " + now.ToString("F"));
                     byte[] outBytes = outBytesClientName.Concat(messege.Value).ToArray();
-                    outBytes = outBytes.Concat(outBytesTime).ToArray();
                     newMesseges.Add(messege.Key, outBytes);
                     break;
             }
         }
 
+    }
+
+    private static void Whisper(Dictionary<TcpClient, string> clientData, KeyValuePair<TcpClient, byte[]> messege, string[] subs)
+    {
+        if (clientData.ContainsValue(subs[1]))
+        {
+            string messegeFormat = "";
+            for (int i = 2; i < subs.Length; i++)
+            {
+                messegeFormat += subs[i];
+                messegeFormat += " ";
+            }
+
+            TcpClient rightClient = null;
+
+            foreach (KeyValuePair<TcpClient, string> client in clientData)
+            {
+                if (client.Value == subs[1])
+                {
+                    rightClient = client.Key;
+                    break;
+                }
+            }
+            SendMessegeToClient(clientData[messege.Key] + " whispers to you: " + messegeFormat, rightClient);
+            SendMessegeToClient("You whisper to: " + subs[1] + " : " + messegeFormat, messege.Key);
+        }
+        else
+        {
+            SendMessegeToClient("Target " + subs[1] + " does not exist ", messege.Key);
+        }
     }
 
     private static void ListAllClientsMessege(Dictionary<TcpClient, string> clientData, List<TcpClient> clients, KeyValuePair<TcpClient, byte[]> messege)
@@ -224,9 +252,10 @@ class TCPServerSample
             {
                 subs[1] = subs[1].ToLower();
                 SendMessegeToClient("Nickname changed to " + subs[1], messege.Key);
-                SendMessegeToAllClientsButOne(clients, clientData[messege.Key]+" changed nickname to "+ subs[1], messege.Key);
+                SendMessegeToAllClientsButOne(clients, clientData[messege.Key] + " changed nickname to " + subs[1], messege.Key);
                 clientData[messege.Key] = subs[1];
             }
+        else SendMessegeToClient("This nickname is invalid", messege.Key);
     }
 }
 
