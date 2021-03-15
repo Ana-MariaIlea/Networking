@@ -61,6 +61,11 @@ public class TCPChatClient : MonoBehaviour
         }
     }
 
+    private void OnDestroy()
+    {
+        _client.Close();
+    }
+
     private void Update()
     {
         if (_client.Available > 0)
