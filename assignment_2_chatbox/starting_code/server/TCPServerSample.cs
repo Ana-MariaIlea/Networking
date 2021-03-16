@@ -44,8 +44,8 @@ class TCPServerSample
                     index++;
                     Console.WriteLine("Accepted new client.");
 
-                    SendMessegeToAllClients(clients, "guest" + index + " has joined the chat", clientData,faultyClients);
-                    SendMessegeToClient("You joined the chat as Guest" + index, client, clients, clientData,faultyClients);
+                    SendMessegeToAllClients(clients, "guest" + index + " has joined the chat", clientData, faultyClients);
+                    SendMessegeToClient("You joined the chat as Guest" + index, client, clients, clientData, faultyClients);
                     clients.Add(client);
                     clientData.Add(client, "guest" + index);
                     Console.WriteLine("Accepted client " + "guest" + index);
@@ -75,11 +75,11 @@ class TCPServerSample
                 if (messeges.Count > 0)
                 {
                     Dictionary<TcpClient, byte[]> newMesseges = new Dictionary<TcpClient, byte[]>();
-                    MakeMesseges(ref clientData, messeges, newMesseges, clients,faultyClients);
+                    MakeMesseges(ref clientData, messeges, newMesseges, clients, faultyClients);
 
                     foreach (KeyValuePair<TcpClient, byte[]> messege in newMesseges)
                     {
-                        SendMessegeToAllClients(clients, messege.Value, clientData,faultyClients);
+                        SendMessegeToAllClients(clients, messege.Value, clientData, faultyClients);
                     }
 
                 }
@@ -135,20 +135,20 @@ class TCPServerSample
 
     private static void SendMessegeToAllClients(List<TcpClient> clients, string messege, Dictionary<TcpClient, string> clientData, List<TcpClient> faultyClients)
     {
-        try
+        // try
+        // {
+        for (int i = 0; i < clients.Count; i++)
         {
-            for (int i = 0; i < clients.Count; i++)
-            {
-                Console.WriteLine("Messege sent to: " + clientData[clients[i]]);
-                SendMessegeToClient(messege, clients[i], clients, clientData,faultyClients);
-            }
+            Console.WriteLine("Messege sent to: " + clientData[clients[i]]);
+            SendMessegeToClient(messege, clients[i], clients, clientData, faultyClients);
         }
-        catch (Exception e)
-        {
-            Console.WriteLine(e.Message);
-            CatchFaultyClients(clients, clientData, faultyClients);
+        //}
+        // catch (Exception e)
+        //{
+        //    Console.WriteLine(e.Message);
+        //     CatchFaultyClients(clients, clientData, faultyClients);
 
-        }
+        //}
 
     }
 
@@ -157,7 +157,7 @@ class TCPServerSample
         for (int i = 0; i < clients.Count; i++)
         {
             if (clients[i] != omittedClient)
-                SendMessegeToClient(messege, clients[i], clients, clientData,faultyClients);
+                SendMessegeToClient(messege, clients[i], clients, clientData, faultyClients);
         }
     }
 
@@ -181,19 +181,19 @@ class TCPServerSample
     }
     private static void SendMessegeToAllClients(List<TcpClient> clients, byte[] messege, Dictionary<TcpClient, string> clientData, List<TcpClient> faultyClients)
     {
-        try
+        // try
+        //{
+        for (int i = 0; i < clients.Count; i++)
         {
-            for (int i = 0; i < clients.Count; i++)
-            {
-                SendMessegeToClient(messege, clients[i], clients, clientData,faultyClients);
-            }
+            SendMessegeToClient(messege, clients[i], clients, clientData, faultyClients);
         }
-        catch (Exception e)
-        {
-            Console.WriteLine(e.Message);
-            CatchFaultyClients(clients, clientData, faultyClients);
+        //}
+        //catch (Exception e)
+        //{
+        //   Console.WriteLine(e.Message);
+        //    CatchFaultyClients(clients, clientData, faultyClients);
 
-        }
+        //}
 
     }
 
@@ -202,7 +202,7 @@ class TCPServerSample
         for (int i = 0; i < clients.Count; i++)
         {
             if (clients[i] != omittedClient)
-                SendMessegeToClient(messege, clients[i], clients, clientData,faultyClients);
+                SendMessegeToClient(messege, clients[i], clients, clientData, faultyClients);
         }
     }
 
@@ -230,23 +230,19 @@ class TCPServerSample
             string[] subs = inString.Split(' ');
             switch (subs[0])
             {
-                case "/setname":
-                    ChangeNickname(clientData, clients, messege, subs,faultyClients);
-                    break;
                 case "/sn":
-                    ChangeNickname(clientData, clients, messege, subs,faultyClients);
+                case "/setname":
+                    ChangeNickname(clientData, clients, messege, subs, faultyClients);
                     break;
                 case "/list":
-                    ListAllClientsMessege(clientData, clients, messege,faultyClients);
+                    ListAllClientsMessege(clientData, clients, messege, faultyClients);
                     break;
                 case "/help":
-                    HelpMesseges(messege, clients, clientData,faultyClients);
-                    break;
-                case "/whisper":
-                    Whisper(clientData, messege, subs, clients,faultyClients);
+                    HelpMesseges(messege, clients, clientData, faultyClients);
                     break;
                 case "/w":
-                    Whisper(clientData, messege, subs, clients,faultyClients);
+                case "/whisper":
+                    Whisper(clientData, messege, subs, clients, faultyClients);
                     break;
                 default:
                     byte[] outBytesClientName = Encoding.UTF8.GetBytes(clientData[messege.Key] + ": ");
@@ -279,46 +275,48 @@ class TCPServerSample
                     break;
                 }
             }
-            SendMessegeToClient(clientData[messege.Key] + " whispers to you: " + messegeFormat, rightClient, clients, clientData,faultyClients);
-            SendMessegeToClient("You whisper to: " + subs[1] + " : " + messegeFormat, messege.Key, clients, clientData,faultyClients);
+            SendMessegeToClient(clientData[messege.Key] + " whispers to you: " + messegeFormat, rightClient, clients, clientData, faultyClients);
+            SendMessegeToClient("You whisper to: " + subs[1] + " : " + messegeFormat, messege.Key, clients, clientData, faultyClients);
         }
         else
         {
-            SendMessegeToClient("Target " + subs[1] + " does not exist ", messege.Key, clients, clientData,faultyClients);
+            SendMessegeToClient("Target " + subs[1] + " does not exist ", messege.Key, clients, clientData, faultyClients);
         }
     }
 
-    private static void ListAllClientsMessege(Dictionary<TcpClient, string> clientData, List<TcpClient> clients, KeyValuePair<TcpClient, byte[]> messege,List<TcpClient> faultyClients)
+    private static void ListAllClientsMessege(Dictionary<TcpClient, string> clientData, List<TcpClient> clients, KeyValuePair<TcpClient, byte[]> messege, List<TcpClient> faultyClients)
     {
-        SendMessegeToClient("There are " + clients.Count + " clients connected:", messege.Key, clients, clientData,faultyClients);
+        SendMessegeToClient("There are " + clients.Count + " clients connected:", messege.Key, clients, clientData, faultyClients);
         foreach (var client in clients)
         {
-            SendMessegeToClient(clientData[client], messege.Key, clients, clientData,faultyClients);
+            SendMessegeToClient(clientData[client], messege.Key, clients, clientData, faultyClients);
         }
     }
 
     private static void HelpMesseges(KeyValuePair<TcpClient, byte[]> messege, List<TcpClient> clients, Dictionary<TcpClient, string> clientData, List<TcpClient> faultyClients)
     {
-        SendMessegeToClient("/setname or /sn to change the nickname", messege.Key, clients, clientData,faultyClients);
-        SendMessegeToClient("/list to list all the connected clients", messege.Key, clients, clientData,faultyClients);
-        SendMessegeToClient("/whisper or /w nickname messege to whisper to target", messege.Key, clients, clientData,faultyClients);
+        SendMessegeToClient("/setname or /sn to change the nickname", messege.Key, clients, clientData, faultyClients);
+        SendMessegeToClient("/list to list all the connected clients", messege.Key, clients, clientData, faultyClients);
+        SendMessegeToClient("/whisper or /w nickname messege to whisper to target", messege.Key, clients, clientData, faultyClients);
     }
 
     private static void ChangeNickname(Dictionary<TcpClient, string> clientData, List<TcpClient> clients, KeyValuePair<TcpClient, byte[]> messege, string[] subs, List<TcpClient> faultyClients)
     {
-        if (subs[1].Length > 0)
-            if (clientData.ContainsValue(subs[1]))
-            {
-                SendMessegeToClient("This nickname is taken", messege.Key, clients, clientData,faultyClients);
-            }
-            else
-            {
-                subs[1] = subs[1].ToLower();
-                SendMessegeToClient("Nickname changed to " + subs[1], messege.Key, clients, clientData,faultyClients);
-                SendMessegeToAllClientsButOne(clients, clientData[messege.Key] + " changed nickname to " + subs[1], messege.Key, clientData,faultyClients);
-                clientData[messege.Key] = subs[1];
-            }
-        else SendMessegeToClient("This nickname is invalid", messege.Key, clients, clientData,faultyClients);
+        if (subs.Length > 2)
+            if (subs[1].Length > 0)
+                if (clientData.ContainsValue(subs[1]))
+                {
+                    SendMessegeToClient("This nickname is taken", messege.Key, clients, clientData, faultyClients);
+                }
+                else
+                {
+                    subs[1] = subs[1].ToLower();
+                    SendMessegeToClient("Nickname changed to " + subs[1], messege.Key, clients, clientData, faultyClients);
+                    SendMessegeToAllClientsButOne(clients, clientData[messege.Key] + " changed nickname to " + subs[1], messege.Key, clientData, faultyClients);
+                    clientData[messege.Key] = subs[1];
+                }
+            else SendMessegeToClient("This nickname is invalid", messege.Key, clients, clientData, faultyClients);
+        else SendMessegeToClient("Did not write a nickmane", messege.Key, clients, clientData, faultyClients);
     }
 }
 
