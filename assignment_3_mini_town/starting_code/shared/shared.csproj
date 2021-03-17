@@ -31,7 +31,7 @@
     <OutputPath>bin\Debug</OutputPath>
     <DefineConstants>DEBUG;</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
+    <WarningLevel>0</WarningLevel>
     <Externalconsole>true</Externalconsole>
     <PlatformTarget>x86</PlatformTarget>
     <RunCodeAnalysis>false</RunCodeAnalysis>
@@ -58,9 +58,13 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="src\model\ServerAvatar.cs" />
+    <Compile Include="src\protocol\AvatarHandler.cs" />
     <Compile Include="src\protocol\SimpleMessage.cs" />
+    <Compile Include="src\protocol\AddAvatarRequest.cs" />
     <Compile Include="src\serialization\ISerializable.cs" />
     <Compile Include="src\serialization\Packet.cs" />
+    <Compile Include="src\protocol\RemoveAvatarRequest.cs" />
     <Compile Include="src\serialization\StreamUtil.cs" />
   </ItemGroup>
   <ItemGroup>

@@ -1,22 +1,13 @@
-﻿using System.Collections.Generic;
-
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace shared
 {
-    public class SimpleMessage : ISerializable
+    public class AvatarHandler : ISerializable
     {
-           string text;
-
-        //    public void Serialize(Packet pPacket)
-        //    {
-        //        pPacket.Write(text);
-        //    }
-
-        //    public void Deserialize(Packet pPacket)
-        //    {
-        //        text = pPacket.ReadString();
-        //
-
         public List<ServerAvatar> avatars;
         public void Serialize(Packet pPacket)
         {
@@ -41,6 +32,5 @@ namespace shared
                 avatars.Add(pPacket.Read<ServerAvatar>());
             }
         }
-    
     }
 }

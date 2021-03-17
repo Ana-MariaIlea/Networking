@@ -89,9 +89,13 @@ public class ChatLobbyClient : MonoBehaviour
             {
                 //we are still communicating with strings at this point, this has to be replaced with either packet or object communication
                 byte[] inBytes = StreamUtil.Read(_client.GetStream());
-                string inString = Encoding.UTF8.GetString(inBytes);
-                Debug.Log("Received:" + inString);
-                showMessage(inString);
+                //string inString = Encoding.UTF8.GetString(inBytes);
+                //Debug.Log("Received:" + inString);
+                //showMessage(inString);
+                Packet inPacket = new Packet(inBytes);
+                ISerializable inObject = inPacket.ReadObject();
+                
+                if (inObject is SimpleMessage) { }
             }
         }
         catch (Exception e)
@@ -101,6 +105,11 @@ public class ChatLobbyClient : MonoBehaviour
             _client.Close();
             connectToServer();
         }
+    }
+
+    private void handleNewAvatar(SimpleMessage plist)
+    {
+        
     }
 
     private void showMessage(string pText)

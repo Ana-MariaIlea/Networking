@@ -78,3 +78,9 @@ D:\Dropbox\HW\saxion\courses_cmgt\2_3_networking\assignments\assignment_3_mini_t
 D:\Dropbox\HW\saxion\courses_cmgt\2_3_networking\assignments\assignment_3_mini_town\starting_code\shared\obj\x86\Debug\shared.csproj.CoreCompileInputs.cache
 D:\Dropbox\HW\saxion\courses_cmgt\2_3_networking\assignments\assignment_3_mini_town\starting_code\shared\obj\x86\Debug\shared.dll
 D:\Dropbox\HW\saxion\courses_cmgt\2_3_networking\assignments\assignment_3_mini_town\starting_code\shared\obj\x86\Debug\shared.pdb
+D:\school\year_2\term_3\Networking\Networking\assignment_3_mini_town\starting_code\shared\bin\Debug\shared.dll
+D:\school\year_2\term_3\Networking\Networking\assignment_3_mini_town\starting_code\shared\bin\Debug\shared.pdb
+D:\school\year_2\term_3\Networking\Networking\assignment_3_mini_town\starting_code\shared\obj\x86\Debug\shared.csprojAssemblyReference.cache
+D:\school\year_2\term_3\Networking\Networking\assignment_3_mini_town\starting_code\shared\obj\x86\Debug\shared.csproj.CoreCompileInputs.cache
+D:\school\year_2\term_3\Networking\Networking\assignment_3_mini_town\starting_code\shared\obj\x86\Debug\shared.dll
+D:\school\year_2\term_3\Networking\Networking\assignment_3_mini_town\starting_code\shared\obj\x86\Debug\shared.pdb
