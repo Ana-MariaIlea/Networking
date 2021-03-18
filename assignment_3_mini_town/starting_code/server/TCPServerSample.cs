@@ -26,6 +26,8 @@ class TCPServerSample
     private Dictionary<TcpClient, ServerAvatar> _clientAvatarData = new Dictionary<TcpClient, ServerAvatar>();
     private List<MessageToSend> _clientMessageData = new List<MessageToSend>();
     private List<AvatarPosition> _newPositionRequests = new List<AvatarPosition>();
+    private MessageToSend whisperMessage = null;
+    private List<GenericClientBool> genericClientBools = new List<GenericClientBool>();
     private int indexAvatar = 1;
 
     private void run()
@@ -95,13 +97,13 @@ class TCPServerSample
             if (client.Available == 0) continue;
 
             //just send back anything we got
-           // StreamUtil.Write(client.GetStream(), StreamUtil.Read(client.GetStream()));
+            // StreamUtil.Write(client.GetStream(), StreamUtil.Read(client.GetStream()));
             byte[] inBytes = StreamUtil.Read(client.GetStream());
             Packet inPacket = new Packet(inBytes);
             ISerializable inObject = inPacket.ReadObject();
             Console.WriteLine("Received:" + inObject);
-            if(inObject is SimpleMessage) { handleMessage(client, inObject as SimpleMessage); }
-            if(inObject is MoveRequest) { handlePositionChange(client, inObject as MoveRequest); }
+            if (inObject is SimpleMessage) { handleMessage(client, inObject as SimpleMessage); }
+            if (inObject is MoveRequest) { handlePositionChange(client, inObject as MoveRequest); }
         }
 
         if (_clientMessageData.Count > 0)
@@ -112,6 +114,20 @@ class TCPServerSample
         {
             UpdatePositions();
         }
+    }
+
+    private void Whisper()
+    {
+        WhisperResponse response = new WhisperResponse();
+        response.messege = whisperMessage;
+        response.clients = genericClientBools;
+        foreach (TcpClient sendClient in _clients)
+        {
+            sendObject(sendClient, response);
+        }
+
+        whisperMessage = new MessageToSend();
+        genericClientBools = new List<GenericClientBool>();
     }
     private void UpdatePositions()
     {
@@ -126,7 +142,7 @@ class TCPServerSample
     }
     private void handlePositionChange(TcpClient pClient, MoveRequest pMessage)
     {
-        Console.WriteLine("Update pos to " + pMessage.position.x + " " + pMessage.position.y + " " + pMessage.position.z+" by key "+ _clientAvatarData[pClient].Id);
+        Console.WriteLine("Update pos to " + pMessage.position.x + " " + pMessage.position.y + " " + pMessage.position.z + " by key " + _clientAvatarData[pClient].Id);
         AvatarPosition newPos = new AvatarPosition(pMessage.position.x, pMessage.position.y, pMessage.position.z, _clientAvatarData[pClient].Id);
         _newPositionRequests.Add(newPos);
         _clientAvatarData[pClient].ChangePosition(pMessage.position);
@@ -145,10 +161,34 @@ class TCPServerSample
     }
     private void handleMessage(TcpClient pClient, SimpleMessage pMessage)
     {
-        MessageToSend message = new MessageToSend(pMessage.text.text,_clientAvatarData[pClient].Id);
+        MessageToSend message = new MessageToSend(pMessage.text.text, _clientAvatarData[pClient].Id);
         if (message.IsMessageCommand())
         {
+            whisperMessage = new MessageToSend(message.GetRestOfMessage(),message.sender);
+            genericClientBools.Add(new GenericClientBool(_clientAvatarData[pClient].Id, true));
+            foreach (var client in _clients)
+            {
+                
+                if (client != pClient)
+                {
+                    double distance = Math.Sqrt(Math.Pow(_clientAvatarData[pClient].posX - _clientAvatarData[client].posX, 2) +
+                        Math.Pow(_clientAvatarData[pClient].posY - _clientAvatarData[client].posY, 2) +
+                        Math.Pow(_clientAvatarData[pClient].posZ - _clientAvatarData[client].posZ, 2));
 
+                    if (distance <= 2)
+                    {
+                        genericClientBools.Add(new GenericClientBool(_clientAvatarData[client].Id, true));
+
+                        Console.WriteLine("message added to list");
+                    }
+                    else
+                    {
+                        genericClientBools.Add(new GenericClientBool(_clientAvatarData[client].Id, false));
+                    }
+                }
+            }
+
+            Whisper();
         }
         else
         {

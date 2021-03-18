@@ -118,6 +118,7 @@ public class ChatLobbyClient : MonoBehaviour
                 if (inObject is AvatarHandler) { handleNewAvatar(inObject as AvatarHandler); }
                 if (inObject is MessageResponses) { showMessages(inObject as MessageResponses); }
                 if (inObject is MoveResponse) { handleMoveResponse(inObject as MoveResponse); }
+                if (inObject is WhisperResponse) { handleWhisperResponse(inObject as WhisperResponse); }
             }
         }
         catch (Exception e)
@@ -126,6 +127,20 @@ public class ChatLobbyClient : MonoBehaviour
             Debug.Log(e.Message);
             _client.Close();
             connectToServer();
+        }
+    }
+
+    private void handleWhisperResponse(WhisperResponse response)
+    {
+        MessageToSend message = response.messege;
+        List<GenericClientBool> gc = response.clients;
+        foreach (var item in gc)
+        {
+            if (item.cond)
+            {
+                AvatarView avatarView = _avatarAreaManager.GetAvatarView(item.id);
+                avatarView.Say(message.text);
+            }
         }
     }
 
