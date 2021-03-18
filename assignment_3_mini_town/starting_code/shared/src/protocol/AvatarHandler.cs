@@ -32,5 +32,14 @@ namespace shared
                 avatars.Add(pPacket.Read<ServerAvatar>());
             }
         }
+
+        public bool HasId(int Id)
+        {
+            foreach (ServerAvatar avatar in avatars)
+            {
+                if (avatar.Id == Id) return true;
+            }
+            return false;
+        }
     }
 }

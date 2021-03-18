@@ -5,7 +5,7 @@ namespace shared
 {
     public class SimpleMessage : ISerializable
     {
-        string text;
+        public string text;
 
         public void Serialize(Packet pPacket)
         {
@@ -15,8 +15,8 @@ namespace shared
         public void Deserialize(Packet pPacket)
         {
             text = pPacket.ReadString();
-
-
         }
+
+
     }
 }

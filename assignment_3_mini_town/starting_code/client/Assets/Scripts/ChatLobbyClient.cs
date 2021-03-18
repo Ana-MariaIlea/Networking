@@ -65,11 +65,33 @@ public class ChatLobbyClient : MonoBehaviour
     {
         try
         {
-            //we are still communicating with strings at this point, this has to be replaced with either packet or object communication
             Debug.Log("Sending:" + pOutString);
-            byte[] outBytes = Encoding.UTF8.GetBytes(pOutString);
-            StreamUtil.Write(_client.GetStream(), outBytes);
+            SimpleMessage message = new SimpleMessage();
+            message.text = pOutString;
+            sendObject(message);
+            //byte[] outBytes = Encoding.UTF8.GetBytes(pOutString);
+            //StreamUtil.Write(_client.GetStream(), outBytes);
         }
+        catch (Exception e)
+        {
+            //for quicker testing, we reconnect if something goes wrong.
+            Debug.Log(e.Message);
+            _client.Close();
+            connectToServer();
+        }
+    }
+    private void sendObject(ISerializable pOutObject)
+    {
+        try
+        {
+            Debug.Log("Sending:" + pOutObject);
+
+            Packet outPacket = new Packet();
+            outPacket.Write(pOutObject);
+
+            StreamUtil.Write(_client.GetStream(), outPacket.GetBytes());
+        }
+
         catch (Exception e)
         {
             //for quicker testing, we reconnect if something goes wrong.
@@ -98,6 +120,7 @@ public class ChatLobbyClient : MonoBehaviour
                 ISerializable inObject = inPacket.ReadObject();
                 
                 if (inObject is AvatarHandler) { handleNewAvatar(inObject as AvatarHandler); }
+                if (inObject is MessageResponses) { showMessages(inObject as MessageResponses); }
             }
         }
         catch (Exception e)
@@ -112,6 +135,20 @@ public class ChatLobbyClient : MonoBehaviour
     private void handleNewAvatar(AvatarHandler plist)
     {
         Debug.Log("Package received");
+        List<int> presentAvatarIds = _avatarAreaManager.GetAllAvatarIds();
+        List<int> presentAvatarIdsToRemove = new List<int>();
+        foreach (var item in presentAvatarIds)
+        {
+            if (!plist.HasId(item))
+            {
+                presentAvatarIdsToRemove.Add(item);
+            }
+        }
+
+        foreach (var item in presentAvatarIdsToRemove)
+        {
+            _avatarAreaManager.RemoveAvatarView(item);
+        }
 
         List<ServerAvatar> avatarHandlers = plist.avatars;
 
@@ -119,15 +156,30 @@ public class ChatLobbyClient : MonoBehaviour
         {
             if (!_avatarAreaManager.HasAvatarView(avatar.Id))
             {
-                Debug.Log("Avatar Added");
 
                 AvatarView avatarView = _avatarAreaManager.AddAvatarView(avatar.Id);
                 avatarView.transform.localPosition = new Vector3(avatar.posX, avatar.posY, avatar.posZ);
                 avatarView.SetSkin(avatar.skinId);
+                Debug.Log("Avatar Added at "+ avatarView.transform.localPosition);
+
             }
         }
+
+  
     }
 
+
+    private void showMessages(MessageResponses pMessages)
+    {
+        Debug.Log("messeges received");
+        List<Message> m = pMessages.messeges;
+        foreach (var item in m)
+        {
+            Debug.Log(item.text + "  " + item.sender);
+            AvatarView avatarView = _avatarAreaManager.GetAvatarView(item.sender);
+            avatarView.Say(item.text);
+        }
+    }
     private void showMessage(string pText)
     {
         //This is a stub for what should actually happen

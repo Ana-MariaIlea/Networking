@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace shared.src.serialization
+namespace shared.src.protocol
 {
-    class RemoveAvatarRequest
+    class MoveRequest
     {
     }
 }
