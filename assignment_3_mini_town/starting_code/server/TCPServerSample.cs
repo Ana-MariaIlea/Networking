@@ -56,7 +56,7 @@ class TCPServerSample
 			
 			Console.WriteLine("Accepted new client.");
 			//Add a new character
-			SimpleMessage newAvatarList = new SimpleMessage();
+			AvatarHandler newAvatarList = new AvatarHandler();
 			newAvatarList.avatars = _clientAvatarData.Values.ToList<ServerAvatar>();
 
             foreach (TcpClient sendClient in _clients)

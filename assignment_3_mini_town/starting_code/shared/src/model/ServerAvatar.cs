@@ -8,11 +8,11 @@ namespace shared
 {
     public class ServerAvatar : ISerializable
     {
-        int Id;
-        int skinId;
-        int posX;
-        int posY;
-        int posZ;
+        public int Id;
+        public int skinId;
+        public int posX;
+        public int posY;
+        public int posZ;
 
         public ServerAvatar() { }
 

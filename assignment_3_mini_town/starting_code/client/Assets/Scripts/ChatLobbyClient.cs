@@ -88,6 +88,8 @@ public class ChatLobbyClient : MonoBehaviour
             if (_client.Available > 0)
             {
                 //we are still communicating with strings at this point, this has to be replaced with either packet or object communication
+
+                Debug.Log("Something was sent");
                 byte[] inBytes = StreamUtil.Read(_client.GetStream());
                 //string inString = Encoding.UTF8.GetString(inBytes);
                 //Debug.Log("Received:" + inString);
@@ -95,7 +97,7 @@ public class ChatLobbyClient : MonoBehaviour
                 Packet inPacket = new Packet(inBytes);
                 ISerializable inObject = inPacket.ReadObject();
                 
-                if (inObject is SimpleMessage) { }
+                if (inObject is AvatarHandler) { handleNewAvatar(inObject as AvatarHandler); }
             }
         }
         catch (Exception e)
@@ -107,9 +109,23 @@ public class ChatLobbyClient : MonoBehaviour
         }
     }
 
-    private void handleNewAvatar(SimpleMessage plist)
+    private void handleNewAvatar(AvatarHandler plist)
     {
-        
+        Debug.Log("Package received");
+
+        List<ServerAvatar> avatarHandlers = plist.avatars;
+
+        foreach (var avatar in avatarHandlers)
+        {
+            if (!_avatarAreaManager.HasAvatarView(avatar.Id))
+            {
+                Debug.Log("Avatar Added");
+
+                AvatarView avatarView = _avatarAreaManager.AddAvatarView(avatar.Id);
+                avatarView.transform.localPosition = new Vector3(avatar.posX, avatar.posY, avatar.posZ);
+                avatarView.SetSkin(avatar.skinId);
+            }
+        }
     }
 
     private void showMessage(string pText)
