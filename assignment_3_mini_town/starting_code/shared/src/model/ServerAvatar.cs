@@ -25,6 +25,13 @@ namespace shared
             posZ = pPosZ;
         }
 
+        public void ChangePosition(AvatarPositionRequest newPosition)
+        {
+            posX = newPosition.x;
+            posY = newPosition.y;
+            posZ = newPosition.z;
+        }
+
         public void Serialize(Packet pPacket)
         {
             pPacket.Write(Id);

@@ -6,32 +6,23 @@ using System.Threading.Tasks;
 
 namespace shared
 {
-    public class Message:ISerializable
+    public class MessageReceived : ISerializable
     {
-        public int sender;
         public string text;
 
-        public Message() { }
-        public Message(string value,int senderId)
+        public MessageReceived() { }
+        public MessageReceived(string value)
         {
             text = value;
-            sender = senderId;
         }
         public void Serialize(Packet pPacket)
         {
             pPacket.Write(text);
-            pPacket.Write(sender);
         }
 
         public void Deserialize(Packet pPacket)
         {
             text = pPacket.ReadString();
-            sender = pPacket.ReadInt();
-        }
-
-        public bool IsMessageCommand()
-        {
-            return false;
         }
     }
 }

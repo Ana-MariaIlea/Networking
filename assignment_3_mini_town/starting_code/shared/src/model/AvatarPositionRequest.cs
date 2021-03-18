@@ -6,21 +6,19 @@ using System.Threading.Tasks;
 
 namespace shared
 {
-    public class AvatarPosition:ISerializable
+    public class AvatarPositionRequest:ISerializable
     {
         public int x;
         public int y;
         public int z;
-        public int senderId;
 
-        public AvatarPosition() { }
+        public AvatarPositionRequest() { }
 
-        public AvatarPosition(int px, int py, int pz, int pSenderId)
+        public AvatarPositionRequest(int px, int py, int pz)
         {
             x = px;
             y = py;
             z = pz;
-            senderId = pSenderId;
         }
 
         public void Serialize(Packet pPacket)
@@ -28,7 +26,6 @@ namespace shared
             pPacket.Write(x);
             pPacket.Write(y);
             pPacket.Write(z);
-            pPacket.Write(senderId);
         }
 
         public void Deserialize(Packet pPacket)
@@ -36,7 +33,6 @@ namespace shared
             x = pPacket.ReadInt();
             y = pPacket.ReadInt();
             z = pPacket.ReadInt();
-            senderId = pPacket.ReadInt();
         }
     }
 }

@@ -9,7 +9,7 @@ namespace shared
 
     public class MessageResponses:ISerializable
     {
-        public List<Message> messeges;
+        public List<MessageToSend> messeges;
 
         public void Serialize(Packet pPacket)
         {
@@ -25,13 +25,13 @@ namespace shared
 
         public void Deserialize(Packet pPacket)
         {
-            messeges = new List<Message>();
+            messeges = new List<MessageToSend>();
 
             int count = pPacket.ReadInt();
 
             for (int i = 0; i < count; i++)
             {
-                messeges.Add(pPacket.Read<Message>());
+                messeges.Add(pPacket.Read<MessageToSend>());
             }
         }
     }

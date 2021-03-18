@@ -24,7 +24,8 @@ class TCPServerSample
     private List<TcpClient> _clients = new List<TcpClient>();
     private List<TcpClient> _faultyClients = new List<TcpClient>();
     private Dictionary<TcpClient, ServerAvatar> _clientAvatarData = new Dictionary<TcpClient, ServerAvatar>();
-    private List<Message> _clientMessageData = new List<Message>();
+    private List<MessageToSend> _clientMessageData = new List<MessageToSend>();
+    private List<AvatarPosition> _newPositionRequests = new List<AvatarPosition>();
     private int indexAvatar = 1;
 
     private void run()
@@ -100,12 +101,35 @@ class TCPServerSample
             ISerializable inObject = inPacket.ReadObject();
             Console.WriteLine("Received:" + inObject);
             if(inObject is SimpleMessage) { handleMessage(client, inObject as SimpleMessage); }
+            if(inObject is MoveRequest) { handlePositionChange(client, inObject as MoveRequest); }
         }
 
         if (_clientMessageData.Count > 0)
         {
             sendMessages();
         }
+        if (_newPositionRequests.Count > 0)
+        {
+            UpdatePositions();
+        }
+    }
+    private void UpdatePositions()
+    {
+        MoveResponse response = new MoveResponse();
+        response.positions = _newPositionRequests;
+        foreach (TcpClient sendClient in _clients)
+        {
+            sendObject(sendClient, response);
+        }
+
+        _newPositionRequests = new List<AvatarPosition>();
+    }
+    private void handlePositionChange(TcpClient pClient, MoveRequest pMessage)
+    {
+        Console.WriteLine("Update pos to " + pMessage.position.x + " " + pMessage.position.y + " " + pMessage.position.z+" by key "+ _clientAvatarData[pClient].Id);
+        AvatarPosition newPos = new AvatarPosition(pMessage.position.x, pMessage.position.y, pMessage.position.z, _clientAvatarData[pClient].Id);
+        _newPositionRequests.Add(newPos);
+        _clientAvatarData[pClient].ChangePosition(pMessage.position);
     }
 
     private void sendMessages()
@@ -117,11 +141,11 @@ class TCPServerSample
             sendObject(sendClient, response);
         }
 
-        _clientMessageData = new List<Message>();
+        _clientMessageData = new List<MessageToSend>();
     }
     private void handleMessage(TcpClient pClient, SimpleMessage pMessage)
     {
-        Message message = new Message(pMessage.text,_clientAvatarData[pClient].Id);
+        MessageToSend message = new MessageToSend(pMessage.text.text,_clientAvatarData[pClient].Id);
         if (message.IsMessageCommand())
         {
 

@@ -4,9 +4,20 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace shared.src.protocol
+namespace shared
 {
-    class MoveRequest
+    public class MoveRequest:ISerializable
     {
+        public AvatarPositionRequest position;
+
+        public void Serialize(Packet pPacket)
+        {
+            pPacket.Write(position);
+        }
+
+        public void Deserialize(Packet pPacket)
+        {
+            position = pPacket.Read<AvatarPositionRequest>();
+        }
     }
 }

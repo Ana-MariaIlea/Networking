@@ -52,6 +52,9 @@ public class ChatLobbyClient : MonoBehaviour
     private void onAvatarAreaClicked(Vector3 pClickPosition)
     {
         Debug.Log("ChatLobbyClient: you clicked on " + pClickPosition);
+        MoveRequest move = new MoveRequest();
+        move.position = new AvatarPositionRequest((int)pClickPosition.x, (int)pClickPosition.y, (int)pClickPosition.z);
+        sendObject(move);
         //TODO pass data to the server so that the server can send a position update to all clients (if the position is valid!!)
     }
 
@@ -67,10 +70,8 @@ public class ChatLobbyClient : MonoBehaviour
         {
             Debug.Log("Sending:" + pOutString);
             SimpleMessage message = new SimpleMessage();
-            message.text = pOutString;
+            message.text = new MessageReceived(pOutString);
             sendObject(message);
-            //byte[] outBytes = Encoding.UTF8.GetBytes(pOutString);
-            //StreamUtil.Write(_client.GetStream(), outBytes);
         }
         catch (Exception e)
         {
@@ -109,18 +110,14 @@ public class ChatLobbyClient : MonoBehaviour
         {
             if (_client.Available > 0)
             {
-                //we are still communicating with strings at this point, this has to be replaced with either packet or object communication
-
                 Debug.Log("Something was sent");
                 byte[] inBytes = StreamUtil.Read(_client.GetStream());
-                //string inString = Encoding.UTF8.GetString(inBytes);
-                //Debug.Log("Received:" + inString);
-                //showMessage(inString);
                 Packet inPacket = new Packet(inBytes);
                 ISerializable inObject = inPacket.ReadObject();
                 
                 if (inObject is AvatarHandler) { handleNewAvatar(inObject as AvatarHandler); }
                 if (inObject is MessageResponses) { showMessages(inObject as MessageResponses); }
+                if (inObject is MoveResponse) { handleMoveResponse(inObject as MoveResponse); }
             }
         }
         catch (Exception e)
@@ -168,11 +165,21 @@ public class ChatLobbyClient : MonoBehaviour
   
     }
 
-
+    private void handleMoveResponse(MoveResponse pResponse)
+    {
+        Debug.Log("new positions received");
+        List<AvatarPosition> m = pResponse.positions;
+        foreach (var item in m)
+        {
+            Debug.Log(item.senderId);
+            AvatarView avatarView = _avatarAreaManager.GetAvatarView(item.senderId);
+            avatarView.Move(new Vector3(item.x, item.y, item.z));
+        }
+    }
     private void showMessages(MessageResponses pMessages)
     {
         Debug.Log("messeges received");
-        List<Message> m = pMessages.messeges;
+        List<MessageToSend> m = pMessages.messeges;
         foreach (var item in m)
         {
             Debug.Log(item.text + "  " + item.sender);
