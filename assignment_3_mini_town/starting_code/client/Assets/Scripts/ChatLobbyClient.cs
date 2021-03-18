@@ -118,7 +118,6 @@ public class ChatLobbyClient : MonoBehaviour
                 if (inObject is AvatarHandler) { handleNewAvatar(inObject as AvatarHandler); }
                 if (inObject is MessageResponses) { showMessages(inObject as MessageResponses); }
                 if (inObject is MoveResponse) { handleMoveResponse(inObject as MoveResponse); }
-                if (inObject is WhisperResponse) { handleWhisperResponse(inObject as WhisperResponse); }
             }
         }
         catch (Exception e)
@@ -127,20 +126,6 @@ public class ChatLobbyClient : MonoBehaviour
             Debug.Log(e.Message);
             _client.Close();
             connectToServer();
-        }
-    }
-
-    private void handleWhisperResponse(WhisperResponse response)
-    {
-        MessageToSend message = response.messege;
-        List<GenericClientBool> gc = response.clients;
-        foreach (var item in gc)
-        {
-            if (item.cond)
-            {
-                AvatarView avatarView = _avatarAreaManager.GetAvatarView(item.id);
-                avatarView.Say(message.text);
-            }
         }
     }
 
@@ -184,17 +169,29 @@ public class ChatLobbyClient : MonoBehaviour
     {
         Debug.Log("new positions received");
         List<AvatarPosition> m = pResponse.positions;
+        Debug.Log(m.Count);
+        List<int> t = _avatarAreaManager.GetAllAvatarIds();
+        foreach (var item in t)
+        {
+            Debug.Log(item);
+        }
+        int it=1;
         foreach (var item in m)
         {
-            Debug.Log(item.senderId);
+            
             AvatarView avatarView = _avatarAreaManager.GetAvatarView(item.senderId);
+            Debug.Log("Avatar will be moved "+ item.senderId);
             avatarView.Move(new Vector3(item.x, item.y, item.z));
+            Debug.Log("iteration " + it);
+            it++;
         }
+
+        Debug.Log("end position update");
     }
     private void showMessages(MessageResponses pMessages)
     {
         Debug.Log("messeges received");
-        List<MessageToSend> m = pMessages.messeges;
+        List<MessageToSend> m = pMessages.messages;
         foreach (var item in m)
         {
             Debug.Log(item.text + "  " + item.sender);

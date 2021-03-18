@@ -58,6 +58,7 @@ public class AvatarView : MonoBehaviour
      */
     public void Move(Vector3 pEndPosition)
     {
+        Debug.Log("move was called at "+pEndPosition);
         _target = pEndPosition;
         _moving = true;
         updateAnimator();

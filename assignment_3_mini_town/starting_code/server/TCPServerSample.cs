@@ -23,11 +23,11 @@ class TCPServerSample
     private TcpListener _listener;
     private List<TcpClient> _clients = new List<TcpClient>();
     private List<TcpClient> _faultyClients = new List<TcpClient>();
+    private List<TcpClient> _whisperClients = new List<TcpClient>();
     private Dictionary<TcpClient, ServerAvatar> _clientAvatarData = new Dictionary<TcpClient, ServerAvatar>();
     private List<MessageToSend> _clientMessageData = new List<MessageToSend>();
     private List<AvatarPosition> _newPositionRequests = new List<AvatarPosition>();
     private MessageToSend whisperMessage = null;
-    private List<GenericClientBool> genericClientBools = new List<GenericClientBool>();
     private int indexAvatar = 1;
 
     private void run()
@@ -118,16 +118,15 @@ class TCPServerSample
 
     private void Whisper()
     {
-        WhisperResponse response = new WhisperResponse();
-        response.messege = whisperMessage;
-        response.clients = genericClientBools;
-        foreach (TcpClient sendClient in _clients)
+        MessageResponses responses = new MessageResponses();
+        List<MessageToSend> m = new List<MessageToSend>();
+        m.Add(whisperMessage);
+        responses.messages = m;
+        foreach (TcpClient sendClient in _whisperClients)
         {
-            sendObject(sendClient, response);
+            sendObject(sendClient, responses);
         }
-
-        whisperMessage = new MessageToSend();
-        genericClientBools = new List<GenericClientBool>();
+        _whisperClients = new List<TcpClient>();
     }
     private void UpdatePositions()
     {
@@ -151,7 +150,7 @@ class TCPServerSample
     private void sendMessages()
     {
         MessageResponses response = new MessageResponses();
-        response.messeges = _clientMessageData;
+        response.messages = _clientMessageData;
         foreach (TcpClient sendClient in _clients)
         {
             sendObject(sendClient, response);
@@ -165,25 +164,22 @@ class TCPServerSample
         if (message.IsMessageCommand())
         {
             whisperMessage = new MessageToSend(message.GetRestOfMessage(),message.sender);
-            genericClientBools.Add(new GenericClientBool(_clientAvatarData[pClient].Id, true));
+            _whisperClients.Add(pClient);
+            //genericClientBools.Add(new GenericClientBool(_clientAvatarData[pClient].Id, true));
             foreach (var client in _clients)
             {
                 
                 if (client != pClient)
                 {
-                    double distance = Math.Sqrt(Math.Pow(_clientAvatarData[pClient].posX - _clientAvatarData[client].posX, 2) +
-                        Math.Pow(_clientAvatarData[pClient].posY - _clientAvatarData[client].posY, 2) +
-                        Math.Pow(_clientAvatarData[pClient].posZ - _clientAvatarData[client].posZ, 2));
-
+                    double distance = Math.Sqrt(Math.Pow(_clientAvatarData[client].posX - _clientAvatarData[pClient].posX, 2) +
+                        Math.Pow(_clientAvatarData[client].posY - _clientAvatarData[pClient].posY, 2) +
+                        Math.Pow(_clientAvatarData[client].posZ - _clientAvatarData[pClient].posZ, 2));
+                    Console.WriteLine(distance);
                     if (distance <= 2)
                     {
-                        genericClientBools.Add(new GenericClientBool(_clientAvatarData[client].Id, true));
+                        _whisperClients.Add(client);
 
                         Console.WriteLine("message added to list");
-                    }
-                    else
-                    {
-                        genericClientBools.Add(new GenericClientBool(_clientAvatarData[client].Id, false));
                     }
                 }
             }
