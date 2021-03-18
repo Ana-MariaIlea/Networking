@@ -60,6 +60,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="src\model\AvatarPosition.cs" />
     <Compile Include="src\model\AvatarPositionRequest.cs" />
+    <Compile Include="src\model\AvatarSkin.cs" />
     <Compile Include="src\model\MessageReceived.cs" />
     <Compile Include="src\model\MessageToSend.cs" />
     <Compile Include="src\model\ServerAvatar.cs" />
@@ -67,6 +68,7 @@
     <Compile Include="src\protocol\MessageResponses.cs" />
     <Compile Include="src\protocol\MoveRequest.cs" />
     <Compile Include="src\protocol\MoveResponse.cs" />
+    <Compile Include="src\protocol\SetNewSkinResponse.cs" />
     <Compile Include="src\protocol\SimpleMessage.cs" />
     <Compile Include="src\serialization\ISerializable.cs" />
     <Compile Include="src\serialization\Packet.cs" />

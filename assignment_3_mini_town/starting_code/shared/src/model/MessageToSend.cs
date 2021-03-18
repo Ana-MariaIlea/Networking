@@ -32,7 +32,7 @@ namespace shared
         public bool IsMessageCommand()
         {
             
-            if (text.Split(' ')[0] == "/whisper") return true;
+            if (text.Split(' ')[0] == "/whisper"|| text.Split(' ')[0] == "/setskin") return true;
             return false;
         }
 

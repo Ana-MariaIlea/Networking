@@ -118,6 +118,7 @@ public class ChatLobbyClient : MonoBehaviour
                 if (inObject is AvatarHandler) { handleNewAvatar(inObject as AvatarHandler); }
                 if (inObject is MessageResponses) { showMessages(inObject as MessageResponses); }
                 if (inObject is MoveResponse) { handleMoveResponse(inObject as MoveResponse); }
+                if (inObject is SetNewSkinResponse) { setSkinResponse(inObject as SetNewSkinResponse); }
             }
         }
         catch (Exception e)
@@ -126,6 +127,16 @@ public class ChatLobbyClient : MonoBehaviour
             Debug.Log(e.Message);
             _client.Close();
             connectToServer();
+        }
+    }
+
+    private void setSkinResponse(SetNewSkinResponse response)
+    {
+        List<AvatarSkin> s = response.newSkins;
+        foreach (var item in s)
+        {
+            AvatarView avatarView = _avatarAreaManager.GetAvatarView(item.senderId);
+            avatarView.SetSkin(item.skinId);
         }
     }
 
