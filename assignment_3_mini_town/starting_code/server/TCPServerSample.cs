@@ -186,11 +186,15 @@ class TCPServerSample
             }
             if (message.GetCommand() == "/setskin")
             {
-                Console.WriteLine("add skin");
-                Random rand = new Random();
-                int newSkin = rand.Next(0, 100);
-                _clientAvatarData[pClient].skinId = newSkin;
+                int newSkin = -1;
+                do
+                {
+                    Random rand = new Random();
+                    newSkin = rand.Next(0, 100);
+                } while (newSkin == _clientAvatarData[pClient].skinId);
 
+                Console.WriteLine("add skin");
+                _clientAvatarData[pClient].skinId = newSkin;
                 _newSkinRequests.Add(new AvatarSkin(newSkin, _clientAvatarData[pClient].Id));
             }
 
