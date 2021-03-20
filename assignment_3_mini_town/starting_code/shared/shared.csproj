@@ -64,6 +64,7 @@
     <Compile Include="src\model\MessageReceived.cs" />
     <Compile Include="src\model\MessageToSend.cs" />
     <Compile Include="src\model\ServerAvatar.cs" />
+    <Compile Include="src\protocol\ActivateRingRequest.cs" />
     <Compile Include="src\protocol\AvatarHandler.cs" />
     <Compile Include="src\protocol\MessageResponses.cs" />
     <Compile Include="src\protocol\MoveRequest.cs" />

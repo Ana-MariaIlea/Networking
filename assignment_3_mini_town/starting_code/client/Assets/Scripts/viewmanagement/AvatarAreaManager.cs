@@ -64,6 +64,12 @@ public class AvatarAreaManager : MonoBehaviour
         return avatarView;
     }
 
+    public void AddRingToAvatar(int pId)
+    {
+        AvatarView avatarView = GetAvatarView(pId);
+        avatarView.AddRing();
+    }
+
     /**
      * Returns the AvatarView with the given id or an exception if it doesn't exist.
      */

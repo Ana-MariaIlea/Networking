@@ -57,6 +57,9 @@ class TCPServerSample
             _clients.Add(client);
             Console.WriteLine("Accepted new client.");
             AddNewAvatarToClient(client);
+            ActivateRingRequest ringActivation = new ActivateRingRequest();
+            ringActivation.Id = indexAvatar - 1;
+            sendObject(client, ringActivation);
         }
     }
 
@@ -70,9 +73,11 @@ class TCPServerSample
         int posz = (int)(Math.Sin(randomAngle) * randomDistance);
         Console.WriteLine("Avatar added at " + posx + " " + 0 + " " + posz);
         Console.WriteLine("Random angle is " + randomAngle + " Random distance is" + randomDistance);
+        //Make new skin
 
+        int skinId = rand.Next(0, 100) % 4;
         //Add new avatar
-        _clientAvatarData.Add(client, new ServerAvatar(indexAvatar, rand.Next(0, 100), posx, 0, posz));
+        _clientAvatarData.Add(client, new ServerAvatar(indexAvatar, skinId, posx, 0, posz));
         indexAvatar++;
 
         SendAvatarListToClients();
@@ -191,6 +196,7 @@ class TCPServerSample
                 {
                     Random rand = new Random();
                     newSkin = rand.Next(0, 100);
+                    newSkin = newSkin % 4;
                 } while (newSkin == _clientAvatarData[pClient].skinId);
 
                 Console.WriteLine("add skin");
@@ -209,26 +215,29 @@ class TCPServerSample
     private void handleWhisper(TcpClient pClient, MessageToSend message)
     {
         whisperMessage = new MessageToSend(message.GetRestOfMessage(), message.sender);
-        _whisperClients.Add(pClient);
-        foreach (var client in _clients)
+        if (whisperMessage.text != null)
         {
-
-            if (client != pClient)
+            _whisperClients.Add(pClient);
+            foreach (var client in _clients)
             {
-                double distance = Math.Sqrt(Math.Pow(_clientAvatarData[client].posX - _clientAvatarData[pClient].posX, 2) +
-                    Math.Pow(_clientAvatarData[client].posY - _clientAvatarData[pClient].posY, 2) +
-                    Math.Pow(_clientAvatarData[client].posZ - _clientAvatarData[pClient].posZ, 2));
-                Console.WriteLine(distance);
-                if (distance <= 2)
-                {
-                    _whisperClients.Add(client);
 
-                    Console.WriteLine("message added to list");
+                if (client != pClient)
+                {
+                    double distance = Math.Sqrt(Math.Pow(_clientAvatarData[client].posX - _clientAvatarData[pClient].posX, 2) +
+                        Math.Pow(_clientAvatarData[client].posY - _clientAvatarData[pClient].posY, 2) +
+                        Math.Pow(_clientAvatarData[client].posZ - _clientAvatarData[pClient].posZ, 2));
+                    Console.WriteLine(distance);
+                    if (distance <= 2)
+                    {
+                        _whisperClients.Add(client);
+
+                        Console.WriteLine("message added to list");
+                    }
                 }
             }
-        }
 
-        Whisper();
+            Whisper();
+        }
     }
 
     private void sendObject(TcpClient pClient, ISerializable pOutObject)

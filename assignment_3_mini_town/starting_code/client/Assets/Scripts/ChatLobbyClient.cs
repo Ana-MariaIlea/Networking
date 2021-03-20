@@ -119,6 +119,7 @@ public class ChatLobbyClient : MonoBehaviour
                 if (inObject is MessageResponses) { showMessages(inObject as MessageResponses); }
                 if (inObject is MoveResponse) { handleMoveResponse(inObject as MoveResponse); }
                 if (inObject is SetNewSkinResponse) { setSkinResponse(inObject as SetNewSkinResponse); }
+                if (inObject is ActivateRingRequest) { activateRing(inObject as ActivateRingRequest); }
             }
         }
         catch (Exception e)
@@ -128,6 +129,12 @@ public class ChatLobbyClient : MonoBehaviour
             _client.Close();
             connectToServer();
         }
+    }
+
+    private void activateRing(ActivateRingRequest response)
+    {
+        AvatarView avatarView = _avatarAreaManager.GetAvatarView(response.Id);
+        avatarView.AddRing();
     }
 
     private void setSkinResponse(SetNewSkinResponse response)

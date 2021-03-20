@@ -30,6 +30,14 @@ public class AvatarView : MonoBehaviour
     private SpeechBubble _speechBubble; //reference to the speech bubble so we can say stuff
     private Animator _animator = null;  //if present a reference to the animator so we can check if we are walking
 
+
+    [SerializeField] private GameObject ringPrefab = null; //ring prefab added for excelent criteria
+
+    public void AddRing()
+    {
+        GameObject ring = Instantiate<GameObject>(ringPrefab,transform);
+    }
+    
     private void Awake()
     {
         //this should always be present

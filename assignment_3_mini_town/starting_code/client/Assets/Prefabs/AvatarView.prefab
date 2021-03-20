@@ -45,12 +45,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   moveSpeed: 0.05
-  animatorSpeedMultiplier: 60
   prefabs:
   - {fileID: 1812659917213882, guid: 570cb289e64f298419ce887de7b10094, type: 3}
   - {fileID: 1500939411536426, guid: d07dee333faf253458f7d17969198901, type: 3}
   - {fileID: 3155058319838657794, guid: b0dcd06aab643e542bc0910076f14b5e, type: 3}
   - {fileID: 2836004475591695743, guid: 3a1599ac7e03f5545954afe0632cebd2, type: 3}
+  ringPrefab: {fileID: 1071206780428050119, guid: fe9e74d1a90340f4bb6888ab5fb40a89,
+    type: 3}
 --- !u!1001 &7897137914518839060
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -58,10 +59,25 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 8462710110483721664}
     m_Modifications:
+    - target: {fileID: -1218193118970589361, guid: 4e41ca3c2fee3e14080c13b2e975cbf4,
+        type: 3}
+      propertyPath: _playSoundEveryTime
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8950436828591954855, guid: 4e41ca3c2fee3e14080c13b2e975cbf4,
+        type: 3}
+      propertyPath: m_Mesh
+      value: 
+      objectReference: {fileID: 0}
     - target: {fileID: 8950436828708813704, guid: 4e41ca3c2fee3e14080c13b2e975cbf4,
         type: 3}
       propertyPath: m_Name
       value: SpeechBubble
+      objectReference: {fileID: 0}
+    - target: {fileID: 8950436828708813706, guid: 4e41ca3c2fee3e14080c13b2e975cbf4,
+        type: 3}
+      propertyPath: m_RootOrder
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8950436828708813706, guid: 4e41ca3c2fee3e14080c13b2e975cbf4,
         type: 3}
@@ -80,6 +96,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8950436828708813706, guid: 4e41ca3c2fee3e14080c13b2e975cbf4,
         type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8950436828708813706, guid: 4e41ca3c2fee3e14080c13b2e975cbf4,
+        type: 3}
       propertyPath: m_LocalRotation.x
       value: -0
       objectReference: {fileID: 0}
@@ -95,16 +116,6 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8950436828708813706, guid: 4e41ca3c2fee3e14080c13b2e975cbf4,
         type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 8950436828708813706, guid: 4e41ca3c2fee3e14080c13b2e975cbf4,
-        type: 3}
-      propertyPath: m_RootOrder
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8950436828708813706, guid: 4e41ca3c2fee3e14080c13b2e975cbf4,
-        type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
       value: 0
       objectReference: {fileID: 0}
@@ -117,16 +128,6 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: -1218193118970589361, guid: 4e41ca3c2fee3e14080c13b2e975cbf4,
-        type: 3}
-      propertyPath: _playSoundEveryTime
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8950436828591954855, guid: 4e41ca3c2fee3e14080c13b2e975cbf4,
-        type: 3}
-      propertyPath: m_Mesh
-      value: 
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 4e41ca3c2fee3e14080c13b2e975cbf4, type: 3}
