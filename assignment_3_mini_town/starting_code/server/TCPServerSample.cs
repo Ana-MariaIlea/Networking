@@ -23,7 +23,7 @@ class TCPServerSample
     private TcpListener _listener;
     private List<TcpClient> _clients = new List<TcpClient>();
     private List<TcpClient> _faultyClients = new List<TcpClient>();
-    private List<TcpClient> _whisperClients = new List<TcpClient>();
+   // private List<TcpClient> _whisperClients = new List<TcpClient>();
     private Dictionary<TcpClient, ServerAvatar> _clientAvatarData = new Dictionary<TcpClient, ServerAvatar>();
     private List<MessageToSend> _clientMessageData = new List<MessageToSend>();
     private List<AvatarPosition> _newPositionRequests = new List<AvatarPosition>();
@@ -138,7 +138,7 @@ class TCPServerSample
         _newSkinRequests = new List<AvatarSkin>();
     }
 
-    private void Whisper()
+    private void Whisper(List<TcpClient> _whisperClients)
     {
         MessageResponses responses = new MessageResponses();
         List<MessageToSend> m = new List<MessageToSend>();
@@ -148,7 +148,7 @@ class TCPServerSample
         {
             sendObject(sendClient, responses);
         }
-        _whisperClients = new List<TcpClient>();
+       
     }
     private void UpdatePositions()
     {
@@ -165,8 +165,15 @@ class TCPServerSample
     {
         Console.WriteLine("Update pos to " + pMessage.position.x + " " + pMessage.position.y + " " + pMessage.position.z + " by key " + _clientAvatarData[pClient].Id);
         AvatarPosition newPos = new AvatarPosition(pMessage.position.x, pMessage.position.y, pMessage.position.z, _clientAvatarData[pClient].Id);
-        _newPositionRequests.Add(newPos);
-        _clientAvatarData[pClient].ChangePosition(pMessage.position);
+        if (newPos.y == 0&&Math.Abs(newPos.x)<10 && Math.Abs(newPos.z) < 10)
+        {
+            _newPositionRequests.Add(newPos);
+            _clientAvatarData[pClient].ChangePosition(pMessage.position);
+        }
+        else
+        {
+            Console.WriteLine("Invalid position");
+        }
     }
 
     private void sendMessages()
@@ -214,6 +221,7 @@ class TCPServerSample
 
     private void handleWhisper(TcpClient pClient, MessageToSend message)
     {
+        var _whisperClients = new List<TcpClient>();
         whisperMessage = new MessageToSend(message.GetRestOfMessage(), message.sender);
         if (whisperMessage.text != null)
         {
@@ -236,8 +244,11 @@ class TCPServerSample
                 }
             }
 
-            Whisper();
+            Whisper(_whisperClients);
+
+            
         }
+       
     }
 
     private void sendObject(TcpClient pClient, ISerializable pOutObject)
