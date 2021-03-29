@@ -41,8 +41,11 @@ public class LobbyState : ApplicationStateWithView<LobbyView>
     private void onTextEntered(string pText)
     {
         view.ClearInput();
-
-        addOutput("(noone else will see this because I broke the chat on purpose):"+pText);        
+        //Add network packet
+        ChatMessage message = new ChatMessage();
+        message.message = pText;
+        fsm.channel.SendMessage(message);
+        //addOutput("(noone else will see this because I broke the chat on purpose):"+pText);        
     }
 
     /**

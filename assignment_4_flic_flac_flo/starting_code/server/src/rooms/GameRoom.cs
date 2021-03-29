@@ -15,6 +15,8 @@ namespace server
 	class GameRoom : Room
 	{
 		public bool IsGameInPlay { get; private set; }
+		private TcpMessageChannel p1;
+		private TcpMessageChannel p2;
 
 		//wraps the board to play on...
 		private TicTacToeBoard _board = new TicTacToeBoard();
@@ -30,6 +32,13 @@ namespace server
 			IsGameInPlay = true;
 			addMember(pPlayer1);
 			addMember(pPlayer2);
+			SendPlayerNamesInGame names = new SendPlayerNamesInGame();
+			names.player1 = _server.GetPlayerInfo(pPlayer1).name;
+			names.player2 = _server.GetPlayerInfo(pPlayer2).name;
+			pPlayer1.SendMessage(names);
+			pPlayer2.SendMessage(names);
+			p1 = pPlayer1;
+			p2 = pPlayer2;
 		}
 
 		protected override void addMember(TcpMessageChannel pMember)
@@ -53,6 +62,44 @@ namespace server
 			{
 				Log.LogInfo("People left the game...", this);
 			}
+
+			if (IsGameInPlay == true)
+			{
+				TicTacToeBoardData data = _board.GetBoardData();
+
+				if (data.WhoHasWon() != 0)
+				{
+					IsGameInPlay = false;
+					removeMember(p1);
+					removeMember(p2);
+					_server.GetLobbyRoom().AddMember(p1);
+					_server.GetLobbyRoom().AddMember(p2);
+					if (data.WhoHasWon() == 1)
+					{
+						ChatMessage whoWon = new ChatMessage();
+						whoWon.message = _server.GetPlayerInfo(p1).name + " has won";
+						p1.SendMessage(whoWon);
+						p2.SendMessage(whoWon);
+
+						ChatMessage whoLost = new ChatMessage();
+						whoLost.message = _server.GetPlayerInfo(p2).name + " has lost";
+						p1.SendMessage(whoLost);
+						p2.SendMessage(whoLost);
+					}
+					else
+					{
+						ChatMessage whoWon = new ChatMessage();
+						whoWon.message = _server.GetPlayerInfo(p2).name + " has won";
+						p1.SendMessage(whoWon);
+						p2.SendMessage(whoWon);
+
+						ChatMessage whoLost = new ChatMessage();
+						whoLost.message = _server.GetPlayerInfo(p1).name + " has lost";
+						p1.SendMessage(whoLost);
+						p2.SendMessage(whoLost);
+					}
+				}
+			}
 		}
 
 		protected override void handleNetworkMessage(ASerializable pMessage, TcpMessageChannel pSender)
@@ -75,6 +122,8 @@ namespace server
 			makeMoveResult.whoMadeTheMove = playerID;
 			makeMoveResult.boardData = _board.GetBoardData();
 			sendToAll(makeMoveResult);
+
+
 		}
 
 	}

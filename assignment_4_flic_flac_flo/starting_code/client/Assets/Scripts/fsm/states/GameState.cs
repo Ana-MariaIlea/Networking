@@ -39,10 +39,32 @@ public class GameState : ApplicationStateWithView<GameView>
 
     protected override void handleNetworkMessage(ASerializable pMessage)
     {
+        if(pMessage is SendPlayerNamesInGame)
+        {
+            handlePlayerNames(pMessage as SendPlayerNamesInGame);
+        }
+        else
         if (pMessage is MakeMoveResult)
         {
             handleMakeMoveResult(pMessage as MakeMoveResult);
         }
+        else if (pMessage is RoomJoinedEvent) handleRoomJoinedEvent(pMessage as RoomJoinedEvent);
+    }
+
+    private void handleRoomJoinedEvent(RoomJoinedEvent pMessage)
+    {
+        //did we move to the game room?
+        if (pMessage.room == RoomJoinedEvent.Room.LOBBY_ROOM)
+        {
+            fsm.ChangeState<LobbyState>();
+        }
+    }
+    void handlePlayerNames(SendPlayerNamesInGame names)
+    {
+        view.player1Name= names.player1;
+        view.player2Name= names.player2;
+        view.playerLabel1.text = view.player1Name;
+        view.playerLabel2.text = view.player2Name;
     }
 
     private void handleMakeMoveResult(MakeMoveResult pMakeMoveResult)
@@ -53,12 +75,12 @@ public class GameState : ApplicationStateWithView<GameView>
         if (pMakeMoveResult.whoMadeTheMove == 1)
         {
             player1MoveCount++;
-            view.playerLabel1.text = $"Player 1 (Movecount: {player1MoveCount})";
+            view.playerLabel1.text = view.player1Name + " Movecount: " + player1MoveCount;
         }
         if (pMakeMoveResult.whoMadeTheMove == 2)
         {
             player2MoveCount++;
-            view.playerLabel2.text = $"Player 2 (Movecount: {player2MoveCount})";
+            view.playerLabel2.text = view.player2Name + " Movecount: " + player2MoveCount;
         }
 
     }

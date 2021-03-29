@@ -66,6 +66,7 @@ namespace server {
 					TcpClient client = listener.AcceptTcpClient();
 					//and wrap the client in an easier to use communication channel
 					TcpMessageChannel channel = new TcpMessageChannel(client);
+					_playerInfo.Add(channel, new PlayerInfo());
 					//and add it to the login room for further 'processing'
 					_loginRoom.AddMember(channel);
 				}
@@ -74,6 +75,8 @@ namespace server {
 				_loginRoom.Update();
 				_lobbyRoom.Update();
 				_gameRoom.Update();
+
+				//Console.WriteLine(_playerInfo.Count);
 
 				Thread.Sleep(100);
 			}
@@ -99,6 +102,12 @@ namespace server {
 			return _playerInfo[pClient];
 		}
 
+
+		public void ChangePlayerName(TcpMessageChannel pClient,string name)
+        {
+			_playerInfo[pClient].name = name;
+
+		}
 		/**
 		 * Returns a list of all players that match the predicate, e.g. to get a list of 
 		 * all players named bob, you would do:

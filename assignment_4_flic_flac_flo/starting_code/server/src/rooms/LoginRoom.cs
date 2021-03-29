@@ -1,62 +1,87 @@
 ﻿using shared;
+using System.Collections.Generic;
+using System;
 
 namespace server
 {
-	/**
+    /**
 	 * The LoginRoom is the first room clients 'enter' until the client identifies himself with a PlayerJoinRequest. 
 	 * If the client sends the wrong type of request, it will be kicked.
 	 *
 	 * A connected client that never sends anything will be stuck in here for life,
 	 * unless the client disconnects (that will be detected in due time).
-	 */ 
-	class LoginRoom : SimpleRoom
-	{
-		//arbitrary max amount just to demo the concept
-		private const int MAX_MEMBERS = 50;
+	 */
+    class LoginRoom : SimpleRoom
+    {
+        //arbitrary max amount just to demo the concept
+        private const int MAX_MEMBERS = 50;
 
-		public LoginRoom(TCPGameServer pOwner) : base(pOwner)
-		{
-		}
+        public LoginRoom(TCPGameServer pOwner) : base(pOwner)
+        {
+        }
 
-		protected override void addMember(TcpMessageChannel pMember)
-		{
-			base.addMember(pMember);
+        protected override void addMember(TcpMessageChannel pMember)
+        {
+            base.addMember(pMember);
 
-			//notify the client that (s)he is now in the login room, clients can wait for that before doing anything else
-			RoomJoinedEvent roomJoinedEvent = new RoomJoinedEvent();
-			roomJoinedEvent.room = RoomJoinedEvent.Room.LOGIN_ROOM;
-			pMember.SendMessage(roomJoinedEvent);
-		}
+            //notify the client that (s)he is now in the login room, clients can wait for that before doing anything else
+            RoomJoinedEvent roomJoinedEvent = new RoomJoinedEvent();
+            roomJoinedEvent.room = RoomJoinedEvent.Room.LOGIN_ROOM;
+            pMember.SendMessage(roomJoinedEvent);
+        }
 
-		protected override void handleNetworkMessage(ASerializable pMessage, TcpMessageChannel pSender)
-		{
-			if (pMessage is PlayerJoinRequest)
-			{
-				handlePlayerJoinRequest(pMessage as PlayerJoinRequest, pSender);
-			}
-			else //if member sends something else than a PlayerJoinRequest
-			{
-				Log.LogInfo("Declining client, auth request not understood", this);
+        protected override void handleNetworkMessage(ASerializable pMessage, TcpMessageChannel pSender)
+        {
+           
+            if (pMessage is PlayerJoinRequest)
+            {
+                handlePlayerJoinRequest(pMessage as PlayerJoinRequest, pSender);
+            }
+            else //if member sends something else than a PlayerJoinRequest
+            {
+                Log.LogInfo("Declining client, auth request not understood", this);
 
-				//don't provide info back to the member on what it is we expect, just close and remove
-				removeAndCloseMember(pSender);
-			}
-		}
+                //don't provide info back to the member on what it is we expect, just close and remove
+                removeAndCloseMember(pSender);
+            }
+        }
 
-		/**
+
+        /**
 		 * Tell the client he is accepted and move the client to the lobby room.
 		 */
-		private void handlePlayerJoinRequest (PlayerJoinRequest pMessage, TcpMessageChannel pSender)
-		{
-			Log.LogInfo("Moving new client to accepted...", this);
+        private void handlePlayerJoinRequest(PlayerJoinRequest pMessage, TcpMessageChannel pSender)
+        {
+            //if (pMessage.name != null)
+            // {
+            List<PlayerInfo> people = _server.GetPlayerInfo((playerInfo) => playerInfo.name == pMessage.name);
+            if (people.Count == 0)
+            {
+                Log.LogInfo("Moving new client to accepted...", this);
+                PlayerJoinResponse playerJoinResponse = new PlayerJoinResponse();
+                playerJoinResponse.result = PlayerJoinResponse.RequestResult.ACCEPTED;
+                pSender.SendMessage(playerJoinResponse);
 
-			PlayerJoinResponse playerJoinResponse = new PlayerJoinResponse();
-			playerJoinResponse.result = PlayerJoinResponse.RequestResult.ACCEPTED;
-			pSender.SendMessage(playerJoinResponse);
+                removeMember(pSender);
+                _server.ChangePlayerName(pSender, pMessage.name);
+                _server.GetLobbyRoom().AddMember(pSender);
+            }
+            else
+            {
+                Console.WriteLine("name already taken");
+                ChatMessage simpleMessage = new ChatMessage();
+                simpleMessage.message = "Name is already taken";
+                pSender.SendMessage(simpleMessage);
+            }
+            // }
+            // else
+            // {
+            //    Console.WriteLine("invalid name");
+            //     ChatMessage simpleMessage = new ChatMessage();
+            //    simpleMessage.message = "Invalid name";
+            //     pSender.SendMessage(simpleMessage);
+            // }
+        }
 
-			removeMember(pSender);
-			_server.GetLobbyRoom().AddMember(pSender);
-		}
-
-	}
+    }
 }

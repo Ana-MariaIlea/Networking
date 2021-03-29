@@ -12,5 +12,8 @@ public class GameView : View
     public TMP_Text playerLabel1 => _player1Label;
     [SerializeField] private TMP_Text _player2Label = null;
     public TMP_Text playerLabel2 => _player2Label;
+
+    public string player1Name;
+    public string player2Name;
 }
 
