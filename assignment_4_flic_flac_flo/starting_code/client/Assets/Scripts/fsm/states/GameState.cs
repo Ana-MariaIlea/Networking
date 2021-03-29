@@ -14,7 +14,7 @@ public class GameState : ApplicationStateWithView<GameView>
     public override void EnterState()
     {
         base.EnterState();
-        
+
         view.gameBoard.OnCellClicked += _onCellClicked;
     }
 
@@ -39,9 +39,13 @@ public class GameState : ApplicationStateWithView<GameView>
 
     protected override void handleNetworkMessage(ASerializable pMessage)
     {
-        if(pMessage is SendPlayerNamesInGame)
+        if (pMessage is SendPlayerNamesInGame)
         {
             handlePlayerNames(pMessage as SendPlayerNamesInGame);
+        }
+        else if (pMessage is SendBoardData)
+        {
+            HandleBoardDataChange(pMessage as SendBoardData);
         }
         else
         if (pMessage is MakeMoveResult)
@@ -61,10 +65,15 @@ public class GameState : ApplicationStateWithView<GameView>
     }
     void handlePlayerNames(SendPlayerNamesInGame names)
     {
-        view.player1Name= names.player1;
-        view.player2Name= names.player2;
+        view.player1Name = names.player1;
+        view.player2Name = names.player2;
         view.playerLabel1.text = view.player1Name;
         view.playerLabel2.text = view.player2Name;
+    }
+
+    private void HandleBoardDataChange(SendBoardData sendBoardData)
+    {
+        view.gameBoard.SetBoardData(sendBoardData.boardData);
     }
 
     private void handleMakeMoveResult(MakeMoveResult pMakeMoveResult)

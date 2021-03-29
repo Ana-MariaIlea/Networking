@@ -89,7 +89,8 @@ namespace server
                 TcpMessageChannel player2 = _readyMembers[1];
                 removeMember(player1);
                 removeMember(player2);
-                _server.GetGameRoom().StartGame(player1, player2);
+                //_server.GetGameRoom().StartGame(player1, player2);
+                _server.AddGameRoom(player1, player2);
             }
 
             //(un)ready-ing / starting a game changes the lobby/ready count so send out an update

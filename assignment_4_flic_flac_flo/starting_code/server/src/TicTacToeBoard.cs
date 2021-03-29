@@ -33,6 +33,7 @@ namespace server
             Log.LogInfo($"Player {pPlayer} made a move in cell ({column},{row})", this);
         }
 
+
         /**
          * Return the inner board data state so we can send it to a client.
          */

@@ -33,7 +33,8 @@ namespace server {
 
 		private LoginRoom _loginRoom;	//this is the room every new user joins
 		private LobbyRoom _lobbyRoom;	//this is the room a user moves to after a successful 'login'
-		private GameRoom _gameRoom;		//this is the room a user moves to when a game is succesfully started
+		private GameRoom _gameRoom;     //this is the room a user moves to when a game is succesfully started
+		private List<GameRoom> _gameRooms = new List<GameRoom>();
 
 		//stores additional info for a player
 		private Dictionary<TcpMessageChannel, PlayerInfo> _playerInfo = new Dictionary<TcpMessageChannel, PlayerInfo>();
@@ -74,13 +75,31 @@ namespace server {
 				//now update every single room
 				_loginRoom.Update();
 				_lobbyRoom.Update();
-				_gameRoom.Update();
+				//_gameRoom.Update();
 
+                for (int i = 0; i < _gameRooms.Count; i++)
+                {
+					_gameRooms[i].Update();
+                }
 				//Console.WriteLine(_playerInfo.Count);
 
 				Thread.Sleep(100);
 			}
 
+		}
+		public void AddGameRoom(TcpMessageChannel pPlayer1, TcpMessageChannel pPlayer2)
+        {
+			GameRoom room = new GameRoom(this);
+			_gameRooms.Add(room);
+			Log.LogInfo("GameRoom made...", room);
+
+			room.StartGame(pPlayer1, pPlayer2);
+        }
+
+		public void RemoveGameRoom(GameRoom room)
+        {
+			_gameRooms.Remove(room);
+			Log.LogInfo("GameRoom removed...", room);
 		}
 		
 		//provide access to the different rooms on the server 
