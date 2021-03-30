@@ -91,7 +91,7 @@ namespace server {
         {
 			GameRoom room = new GameRoom(this);
 			_gameRooms.Add(room);
-			Log.LogInfo("GameRoom made...", room);
+			Log.LogInfo("GameRoom aded to the list ", room);
 
 			room.StartGame(pPlayer1, pPlayer2);
         }
@@ -99,7 +99,7 @@ namespace server {
 		public void RemoveGameRoom(GameRoom room)
         {
 			_gameRooms.Remove(room);
-			Log.LogInfo("GameRoom removed...", room);
+			Log.LogInfo("GameRoom removed from list ", room);
 		}
 		
 		//provide access to the different rooms on the server 
